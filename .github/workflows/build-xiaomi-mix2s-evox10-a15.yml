@@ -126,6 +126,8 @@ jobs:
           grep -q "CONFIG_SND=y" $DEFCONFIG || echo "CONFIG_SND=y" >> $DEFCONFIG
           grep -q "CONFIG_SND_SOC=y" $DEFCONFIG || echo "CONFIG_SND_SOC=y" >> $DEFCONFIG
           grep -q "CONFIG_SND_SOC_SDM670=y" $DEFCONFIG || echo "CONFIG_SND_SOC_SDM670=y" >> $DEFCONFIG
+          echo "/* empty stub */" > sound/drivers/stub.c
+          grep -q "obj-y += stub.o" sound/drivers/Makefile || echo "obj-y += stub.o" >> sound/drivers/Makefile
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
