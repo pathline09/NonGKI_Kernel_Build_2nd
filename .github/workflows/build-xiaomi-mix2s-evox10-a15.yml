@@ -141,12 +141,11 @@ jobs:
           echo "CONFIG_CORESIGHT=n" >> $DEFCONFIG
           echo "CONFIG_CORESIGHT_SOURCE_ETM4X=n" >> $DEFCONFIG
           echo "==== 开始修复最后一步链接参数冲突 ===="
-          if [ -f Makefile ]; then
-              # 强行从 LDFLAGS_vmlinux 链接变量中剔除可能冲突的 -pie 或 --shared 错误参数
-              sed -i 's/LDFLAGS_vmlinux += -pie/LDFLAGS_vmlinux +=/g' Makefile
-              sed -i 's/LDFLAGS_vmlinux += --shared/LDFLAGS_vmlinux +=/g' Makefile
-              # 补充新版 LLD 兼容的链接过滤项
-              sed -i 's/LDFLAGS_vmlinux += -shared/LDFLAGS_vmlinux +=/g' Makefile
+          # 4. 【真人 Patch 原理】精准清洗高通核心链接脚本参数，移除多余的动态共享库标记
+          LINK_SCRIPT=scripts/link-vmlinux.sh
+          if [ -f "$LINK_SCRIPT" ]; then
+              sed -i 's/--shared//g' "$LINK_SCRIPT"
+              sed -i 's/-shared//g' "$LINK_SCRIPT"
           fi
 
       - name: 🧰 Patch Kernel of Re:Kernel
