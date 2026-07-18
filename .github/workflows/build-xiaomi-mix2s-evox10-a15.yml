@@ -6,14 +6,14 @@ on:
 
 env:
   # Device env
-  DEVICE_NAME : "xiaomi_mix2s"
-  DEVICE_CODENAME : "polaris"
+  DEVICE_NAME : "pixel3a"
+  DEVICE_CODENAME : "sargo"
 
   CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
   EXTRA_CMDS : "LD=ld.lld"
 
-  KERNEL_SOURCE : "https://github.com/JackA1ltman/kernel_xiaomi_sdm845_binder_cgroup_v2.git"
-  KERNEL_BRANCH : "staging"
+  KERNEL_SOURCE : "https://github.com/oomcminizoo/android_kernel_google_msm-4.9.git"
+  KERNEL_BRANCH : "lineage-22.2"
 
   CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
   CLANG_BRANCH : "lineage-20.0"
@@ -25,7 +25,7 @@ env:
   GCC_32_BRANCH : "android12L-release"
 
   DEFCONFIG_SOURCE: ""
-  DEFCONFIG_NAME : "vendor/xiaomi/mi845_defconfig"
+  DEFCONFIG_NAME : "sdm670_defconfig"
   DEFCONFIG_ORIGIN_IMAGE: ""
   DEFCONFIG_FROM_BOOT: false
 
