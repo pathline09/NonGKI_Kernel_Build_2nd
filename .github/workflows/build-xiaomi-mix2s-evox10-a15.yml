@@ -140,6 +140,14 @@ jobs:
           sed -i '/CONFIG_CORESIGHT/d' $DEFCONFIG
           echo "CONFIG_CORESIGHT=n" >> $DEFCONFIG
           echo "CONFIG_CORESIGHT_SOURCE_ETM4X=n" >> $DEFCONFIG
+          echo "==== 开始修复最后一步链接参数冲突 ===="
+          if [ -f Makefile ]; then
+              # 强行从 LDFLAGS_vmlinux 链接变量中剔除可能冲突的 -pie 或 --shared 错误参数
+              sed -i 's/LDFLAGS_vmlinux += -pie/LDFLAGS_vmlinux +=/g' Makefile
+              sed -i 's/LDFLAGS_vmlinux += --shared/LDFLAGS_vmlinux +=/g' Makefile
+              # 补充新版 LLD 兼容的链接过滤项
+              sed -i 's/LDFLAGS_vmlinux += -shared/LDFLAGS_vmlinux +=/g' Makefile
+          fi
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
