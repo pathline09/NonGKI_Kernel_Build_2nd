@@ -125,19 +125,18 @@ jobs:
           # 修复 sound/i2c 目录
           echo "/* empty stub */" > sound/i2c/stub.c
           grep -q "obj-y += stub.o" sound/i2c/Makefile || echo "obj-y += stub.o" >> sound/i2c/Makefile
-          echo "==== 开始全自动修复空 Makefile 编译死胡同 ===="
+          echo "==== 开始全自动底层 Makefile 空值兜底 ===="
           find . -type f -name "Makefile" | while read -r makefile; do
               dir=$(dirname "$makefile")
-              # 如果该目录下没有任何 .c 文件，说明它是一个会引发链接器崩溃的空目录
-              if [ -z "$(find "$dir" -maxdepth 1 -type f -name "*.c" 2>/dev/null)" ]; then
-                  # 排除根目录和不属于源码编译的特殊目录
-                  if [ "$dir" != "." ] && [[ "$dir" != *"scripts"* ]] && [[ "$dir" != *"tools"* ]]; then
-                      echo "发现潜在报错目录: $dir，正在自动注入占位文件..."
-                      echo "/* automatic stub */" > "$dir/stub.c"
-                      grep -q "obj-y += stub.o" "$makefile" || echo "obj-y += stub.o" >> "$makefile"
-                  fi
+              # 排除根目录和非源码编译的系统核心工具目录
+              if [ "$dir" != "." ] && [[ "$dir" != *"scripts"* ]] && [[ "$dir" != *"tools"* ]] && [[ "$dir" != *"documentation"* ]]; then
+                  # 在每个子目录下直接无条件写入空白占位源码
+                  echo "/* absolute safety stub */" > "$dir/stub.c"
+                  # 并在其 Makefile 末尾强制追加 stub.o，确保任何情况下该目录编译出的 .o 列表绝对不为空
+                  grep -q "obj-y += stub.o" "$makefile" || echo -e "\nobj-y += stub.o" >> "$makefile"
               fi
           done
+          echo "==== 兜底完成，彻底根除 target emulation unknown 错误 ===="
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
