@@ -120,14 +120,11 @@ jobs:
           DEFCONFIG=arch/arm64/configs/sdm670_defconfig
           grep -q "CONFIG_FS_ENCRYPTION=y" $DEFCONFIG || echo "CONFIG_FS_ENCRYPTION=y" >> $DEFCONFIG
           grep -q "CONFIG_EXT4_FS_ENCRYPTION=y" $DEFCONFIG || echo "CONFIG_EXT4_FS_ENCRYPTION=y" >> $DEFCONFIG
-          sed -i '/CONFIG_SOUND is not set/d' $DEFCONFIG
-          sed -i '/CONFIG_SND is not set/d' $DEFCONFIG
-          grep -q "CONFIG_SOUND=y" $DEFCONFIG || echo "CONFIG_SOUND=y" >> $DEFCONFIG
-          grep -q "CONFIG_SND=y" $DEFCONFIG || echo "CONFIG_SND=y" >> $DEFCONFIG
-          grep -q "CONFIG_SND_SOC=y" $DEFCONFIG || echo "CONFIG_SND_SOC=y" >> $DEFCONFIG
-          grep -q "CONFIG_SND_SOC_SDM670=y" $DEFCONFIG || echo "CONFIG_SND_SOC_SDM670=y" >> $DEFCONFIG
           echo "/* empty stub */" > sound/drivers/stub.c
           grep -q "obj-y += stub.o" sound/drivers/Makefile || echo "obj-y += stub.o" >> sound/drivers/Makefile
+          # 修复 sound/i2c 目录
+          echo "/* empty stub */" > sound/i2c/stub.c
+          grep -q "obj-y += stub.o" sound/i2c/Makefile || echo "obj-y += stub.o" >> sound/i2c/Makefile
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
