@@ -137,6 +137,9 @@ jobs:
               fi
           done
           echo "==== 兜底完成，彻底根除 target emulation unknown 错误 ===="
+          sed -i '/CONFIG_CORESIGHT/d' $DEFCONFIG
+          echo "CONFIG_CORESIGHT=n" >> $DEFCONFIG
+          echo "CONFIG_CORESIGHT_SOURCE_ETM4X=n" >> $DEFCONFIG
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
