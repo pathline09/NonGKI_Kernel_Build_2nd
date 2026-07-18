@@ -125,6 +125,19 @@ jobs:
           # 修复 sound/i2c 目录
           echo "/* empty stub */" > sound/i2c/stub.c
           grep -q "obj-y += stub.o" sound/i2c/Makefile || echo "obj-y += stub.o" >> sound/i2c/Makefile
+          echo "==== 开始全自动修复空 Makefile 编译死胡同 ===="
+          find . -type f -name "Makefile" | while read -r makefile; do
+              dir=$(dirname "$makefile")
+              # 如果该目录下没有任何 .c 文件，说明它是一个会引发链接器崩溃的空目录
+              if [ -z "$(find "$dir" -maxdepth 1 -type f -name "*.c" 2>/dev/null)" ]; then
+                  # 排除根目录和不属于源码编译的特殊目录
+                  if [ "$dir" != "." ] && [[ "$dir" != *"scripts"* ]] && [[ "$dir" != *"tools"* ]]; then
+                      echo "发现潜在报错目录: $dir，正在自动注入占位文件..."
+                      echo "/* automatic stub */" > "$dir/stub.c"
+                      grep -q "obj-y += stub.o" "$makefile" || echo "obj-y += stub.o" >> "$makefile"
+                  fi
+              fi
+          done
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
