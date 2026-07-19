@@ -186,7 +186,7 @@ jobs:
           echo "CONFIG_PSTORE_RAM=y" >> $DEFCONFIG
           echo "CONFIG_PSTORE_CONSOLE=y" >> $DEFCONFIG
           echo "CONFIG_PSTORE_PMSG=y" >> $DEFCONFIG
-          echo "CONFIG_PSTORE_RAMoops=y" >> $DEFCONFIG
+          echo "CONFIG_PSTORE_RAMOOPS=y" >> $DEFCONFIG
           echo "CONFIG_RAMOOPS=y" >> $DEFCONFIG
           echo "CONFIG_RAMOOPS_DUMP_OOPS=y" >> $DEFCONFIG
           echo "CONFIG_RAMOOPS_MEM_SIZE=0x20000" >> $DEFCONFIG
