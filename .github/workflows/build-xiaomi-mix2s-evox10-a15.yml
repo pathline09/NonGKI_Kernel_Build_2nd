@@ -195,6 +195,13 @@ jobs:
           echo "CONFIG_ANDROID_RAM_CONSOLE_ENABLE_VERBOSE=y" >> $DEFCONFIG
           echo "CONFIG_ANDROID_RAM_CONSOLE_EARLY_INIT=y" >> $DEFCONFIG
           echo "CONFIG_ANDROID_RAM_CONSOLE_BUFFER_SIZE=1048576" >> $DEFCONFIG
+          echo 'CONFIG_CMDLINE="panic=-1 ignore_loglevel printk.devkmsg=on printk.time=1"' >> $DEFCONFIG
+          echo "CONFIG_VT=y" >> $DEFCONFIG
+          echo "CONFIG_VT_CONSOLE=y" >> $DEFCONFIG
+          echo "CONFIG_FRAMEBUFFER_CONSOLE=y" >> $DEFCONFIG
+          echo "CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y" >> $DEFCONFIG
+          echo "CONFIG_LOGO=y" >> $DEFCONFIG
+          echo "CONFIG_CMDLINE_FORCE=y" >> $DEFCONFIG
 
 
       - name: 🧰 Patch Kernel of Re:Kernel
