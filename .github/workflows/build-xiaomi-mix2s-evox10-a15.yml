@@ -10,7 +10,7 @@ env:
   DEVICE_CODENAME : "sargo"
 
   CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
-  EXTRA_CMDS : "LD=ld.lld KBUILD_LDFLAGS=-no-pie"
+  EXTRA_CMDS : "LD=ld.lld KBUILD_LDFLAGS=-no-pie,-Wl,-z,notext"
 
   KERNEL_SOURCE : "https://github.com/oomcminizoo/android_kernel_google_msm-4.9.git"
   KERNEL_BRANCH : "lineage-22.2"
