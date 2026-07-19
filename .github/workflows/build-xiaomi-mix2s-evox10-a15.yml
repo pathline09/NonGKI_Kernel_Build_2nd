@@ -196,6 +196,15 @@ jobs:
               echo "=== 精简后 dtb-y 列表 ==="
               grep "^dtb-y" "$DTS_MK" | head -50
           fi
+          echo "CONFIG_PSTORE=y" >> $DEFCONFIG
+          echo "CONFIG_PSTORE_RAM=y" >> $DEFCONFIG
+          echo "CONFIG_PSTORE_CONSOLE=y" >> $DEFCONFIG
+          echo "CONFIG_PSTORE_PMSG=y" >> $DEFCONFIG
+          echo "CONFIG_PSTORE_RAMoops=y" >> $DEFCONFIG
+          echo "CONFIG_RAMOOPS=y" >> $DEFCONFIG
+          echo "CONFIG_RAMOOPS_DUMP_OOPS=y" >> $DEFCONFIG
+          echo "CONFIG_RAMOOPS_MEM_SIZE=0x20000" >> $DEFCONFIG
+          echo "CONFIG_RAMOOPS_RECORD_SIZE=0x20000" >> $DEFCONFIG
 
 
       - name: 🧰 Patch Kernel of Re:Kernel
