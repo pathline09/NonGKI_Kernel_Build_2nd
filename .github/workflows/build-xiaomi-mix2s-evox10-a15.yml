@@ -136,6 +136,7 @@ jobs:
           fix_empty_dir "sound/i2c"
           fix_empty_dir "drivers/gpu/drm/omapdrm"
           fix_empty_dir "drivers/iio/common"
+          fix_empty_dir "drivers/iio/imu"
          
           echo "==== 兜底完成，彻底根除 target emulation unknown 错误 ===="
           sed -i '/CONFIG_CORESIGHT/d' $DEFCONFIG
