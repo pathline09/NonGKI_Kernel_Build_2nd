@@ -128,14 +128,26 @@ jobs:
           echo "==== 开始全自动底层 Makefile 空值兜底 ===="
           find . -type f -name "Makefile" | while read -r makefile; do
               dir=$(dirname "$makefile")
-              # 排除根目录和非源码编译的系统核心工具目录
-              if [ "$dir" != "." ] && [[ "$dir" != *"scripts"* ]] && [[ "$dir" != *"tools"* ]] && [[ "$dir" != *"documentation"* ]]; then
-                  # 在每个子目录下直接无条件写入空白占位源码
+              # 排除根目录、系统核心工具目录，以及 init/、kernel/、mm/、fs/ 等核心目录
+              if [ "$dir" != "." ] && \
+                 [[ "$dir" != *"scripts"* ]] && \
+                 [[ "$dir" != *"tools"* ]] && \
+                 [[ "$dir" != *"documentation"* ]] && \
+                 [[ "$dir" != "./init"* ]] && \
+                 [[ "$dir" != "./kernel"* ]] && \
+                 [[ "$dir" != "./mm"* ]] && \
+                 [[ "$dir" != "./fs"* ]] && \
+                 [[ "$dir" != "./block"* ]] && \
+                 [[ "$dir" != "./crypto"* ]] && \
+                 [[ "$dir" != "./lib"* ]] && \
+                 [[ "$dir" != "./arch/arm64/kernel"* ]] && \
+                 [[ "$dir" != "./arch/arm64/mm"* ]]; then
+                  
                   echo "/* absolute safety stub */" > "$dir/stub.c"
-                  # 并在其 Makefile 末尾强制追加 stub.o，确保任何情况下该目录编译出的 .o 列表绝对不为空
                   grep -q "obj-y += stub.o" "$makefile" || echo -e "\nobj-y += stub.o" >> "$makefile"
               fi
           done
+          echo "==== 兜底完成 ===="
           echo "==== 兜底完成，彻底根除 target emulation unknown 错误 ===="
           sed -i '/CONFIG_CORESIGHT/d' $DEFCONFIG
           echo "CONFIG_CORESIGHT=n" >> $DEFCONFIG
