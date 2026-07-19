@@ -171,24 +171,17 @@ jobs:
           
           echo "==== LLD 冲突修复完成 ===="
 
-          echo "==== 强制编译 fw_update.c ===="
-
-          echo "CONFIG_MSM_CAMERA_FW_UPDATE=y" >> $DEFCONFIG
-          echo "CONFIG_MSM_CAMERA=y" >> $DEFCONFIG
+           echo "==== 开启相机固件更新配置 ===="
           
-          FW_UPDATE_MK="drivers/media/platform/msm/camera/cam_sensor_module/cam_fw_update/Makefile"
-          if [ -f "$FW_UPDATE_MK" ]; then
-              # 把任何 obj-$(CONFIG_xxx) += fw_update.o 改成 obj-y += fw_update.o
-              sed -i 's|obj-\$(CONFIG_[^)]*) += fw_update.o|obj-y += fw_update.o|' "$FW_UPDATE_MK"
-              # 如果没有 fw_update.o 的规则，直接添加
-              if ! grep -q "fw_update.o" "$FW_UPDATE_MK"; then
-                  echo "obj-y += fw_update.o" >> "$FW_UPDATE_MK"
-              fi
-              echo "Fixed: $FW_UPDATE_MK"
-              cat "$FW_UPDATE_MK"
-          fi
+          # 开启 fw_update 编译
+          grep -q "CONFIG_CAMERA_FW_UPDATE" $DEFCONFIG && sed -i '/CONFIG_CAMERA_FW_UPDATE/d' $DEFCONFIG
+          echo "CONFIG_CAMERA_FW_UPDATE=y" >> $DEFCONFIG
           
-          echo "==== fw_update 修复完成 ===="
+          # 确保 SPECTRA_CAMERA 也开启（cam_actuator 和 cam_ois 依赖它）
+          grep -q "CONFIG_SPECTRA_CAMERA" $DEFCONFIG && sed -i '/CONFIG_SPECTRA_CAMERA/d' $DEFCONFIG
+          echo "CONFIG_SPECTRA_CAMERA=y" >> $DEFCONFIG
+          
+          echo "==== 相机配置修复完成 ===="
 
 
       - name: 🧰 Patch Kernel of Re:Kernel
