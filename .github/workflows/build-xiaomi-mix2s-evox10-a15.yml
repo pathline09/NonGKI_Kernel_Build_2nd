@@ -183,6 +183,20 @@ jobs:
           
           echo "==== 相机配置修复完成 ===="
 
+          echo "==== 精简 DTB ===="
+          DTS_MK="arch/arm64/boot/dts/qcom/Makefile"
+          if [ -f "$DTS_MK" ]; then
+              cp "$DTS_MK" "$DTS_MK.bak"
+              echo "=== 原始 dtb-y 列表 ==="
+              grep "^dtb-y" "$DTS_MK" | head -50
+              
+              # 注释掉所有不包含 sdm670 的 dtb-y 行
+              sed -i '/^dtb-y += /{ /sdm670/!s/^/# / }' "$DTS_MK"
+              
+              echo "=== 精简后 dtb-y 列表 ==="
+              grep "^dtb-y" "$DTS_MK" | head -50
+          fi
+
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
