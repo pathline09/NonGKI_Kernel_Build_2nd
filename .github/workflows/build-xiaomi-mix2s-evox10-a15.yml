@@ -12,8 +12,8 @@ env:
   CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
   EXTRA_CMDS : ""
 
-  KERNEL_SOURCE : "https://github.com/oomcminizoo/android_kernel_google_msm-4.9.git"
-  KERNEL_BRANCH : "lineage-22.2"
+  KERNEL_SOURCE : "https://github.com/crdroidandroid/android_kernel_google_b4s4.git"
+  KERNEL_BRANCH : "15.0"
 
   CLANG_SOURCE : "https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b.git"
   CLANG_BRANCH : "lineage-20.0"
