@@ -120,11 +120,20 @@ jobs:
           DEFCONFIG=arch/arm64/configs/sdm670_defconfig
           grep -q "CONFIG_FS_ENCRYPTION=y" $DEFCONFIG || echo "CONFIG_FS_ENCRYPTION=y" >> $DEFCONFIG
           grep -q "CONFIG_EXT4_FS_ENCRYPTION=y" $DEFCONFIG || echo "CONFIG_EXT4_FS_ENCRYPTION=y" >> $DEFCONFIG
-          echo "/* empty stub */" > sound/drivers/stub.c
-          grep -q "obj-y += stub.o" sound/drivers/Makefile || echo "obj-y += stub.o" >> sound/drivers/Makefile
-          # 修复 sound/i2c 目录
-          echo "/* empty stub */" > sound/i2c/stub.c
-          grep -q "obj-y += stub.o" sound/i2c/Makefile || echo "obj-y += stub.o" >> sound/i2c/Makefile
+          fix_empty_dir() {
+              local dir=$1
+              if [ -d "$dir" ] && [ -f "$dir/Makefile" ]; then
+                  echo "/* stub for $dir */" > "$dir/stub.c"
+                  grep -q "obj-y += stub.o" "$dir/Makefile" || echo "obj-y += stub.o" >> "$dir/Makefile"
+                  echo "Fixed: $dir"
+              fi
+          }
+          
+          # 修复已知会报错的目录（根据你的设备/内核特点）
+          fix_empty_dir "drivers/clk/msm"
+          fix_empty_dir "drivers/clk/msm/mdss"
+          fix_empty_dir "sound/drivers"
+          fix_empty_dir "sound/i2c"
          
           echo "==== 兜底完成，彻底根除 target emulation unknown 错误 ===="
           sed -i '/CONFIG_CORESIGHT/d' $DEFCONFIG
