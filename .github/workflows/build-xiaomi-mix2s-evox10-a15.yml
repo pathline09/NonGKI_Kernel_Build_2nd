@@ -119,6 +119,11 @@ jobs:
           cd $GITHUB_WORKSPACE/device_kernel
           DEFCONFIG=arch/arm64/configs/sdm670_defconfig
           curl -L -o $DEFCONFIG https://raw.githubusercontent.com/pathline09/NonGKI_Kernel_Build_2nd/refs/heads/mainline/config.txt
+          sed -i '/^CONFIG_LOCALVERSION=/d' $DEFCONFIG
+          sed -i '/^CONFIG_LOCALVERSION_AUTO=/d' $DEFCONFIG
+          echo 'CONFIG_LOCALVERSION="-pathline"' >> $DEFCONFIG
+          echo "CONFIG_LOCALVERSION_AUTO=n" >> $DEFCONFIG
+
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
