@@ -143,34 +143,7 @@ jobs:
           sed -i '/CONFIG_CORESIGHT/d' $DEFCONFIG
           echo "CONFIG_CORESIGHT=n" >> $DEFCONFIG
           echo "CONFIG_CORESIGHT_SOURCE_ETM4X=n" >> $DEFCONFIG
-          echo "==== 修复 LLD -shared/-pie 冲突 ===="
-          
-          # 1. 在顶层 Makefile 中，在 KBUILD_LDFLAGS 定义后强制追加 -no-pie
-          # 先找到 KBUILD_LDFLAGS 的初始定义行，在其后添加
-          sed -i '/^KBUILD_LDFLAGS\s*:=/a KBUILD_LDFLAGS += -no-pie' Makefile
-          
-          # 2. 同时确保 LDFLAGS 也加上 -no-pie（某些旧版 Makefile 使用 LDFLAGS）
-          sed -i '/^LDFLAGS\s*:=/a LDFLAGS += -no-pie' Makefile
-          
-          # 3. 【关键】修复 arch/arm64/Makefile 中可能注入 -pie 的地方
-          if [ -f arch/arm64/Makefile ]; then
-              sed -i 's/-pie/-no-pie/g' arch/arm64/Makefile
-              sed -i 's/--no-dynamic-linker//g' arch/arm64/Makefile
-          fi
-          
-          # 4. 【关键】修复 scripts/Makefile.lib 或 scripts/Makefile.build 中的链接规则
-          # 确保 built-in.o 链接时不带 -pie
-          if [ -f scripts/Makefile.build ]; then
-              sed -i 's/$(LD) $(LDFLAGS)/$(LD) -no-pie $(LDFLAGS)/g' scripts/Makefile.build
-          fi
-          
-          # 5. 如果存在 arch/arm64/kernel/Makefile，也检查
-          if [ -f arch/arm64/kernel/Makefile ]; then
-              sed -i 's/-pie/-no-pie/g' arch/arm64/kernel/Makefile
-          fi
-          
-          echo "==== LLD 冲突修复完成 ===="
-
+    
            echo "==== 开启相机固件更新配置 ===="
           
           # 开启 fw_update 编译
@@ -182,6 +155,12 @@ jobs:
           echo "CONFIG_SPECTRA_CAMERA=y" >> $DEFCONFIG
           
           echo "==== 相机配置修复完成 ===="
+          grep -q "CONFIG_CAMERA_FW_UPDATE" $DEFCONFIG && sed -i '/CONFIG_CAMERA_FW_UPDATE/d' $DEFCONFIG
+          echo "CONFIG_CAMERA_FW_UPDATE=y" >> $DEFCONFIG
+          grep -q "CONFIG_SPECTRA_CAMERA" $DEFCONFIG && sed -i '/CONFIG_SPECTRA_CAMERA/d' $DEFCONFIG
+          echo "CONFIG_SPECTRA_CAMERA=y" >> $DEFCONFIG
+          
+          # ====== PSTORE / RAMOOPS（修复大小）======
           echo "CONFIG_PSTORE=y" >> $DEFCONFIG
           echo "CONFIG_PSTORE_RAM=y" >> $DEFCONFIG
           echo "CONFIG_PSTORE_CONSOLE=y" >> $DEFCONFIG
@@ -189,19 +168,20 @@ jobs:
           echo "CONFIG_PSTORE_RAMOOPS=y" >> $DEFCONFIG
           echo "CONFIG_RAMOOPS=y" >> $DEFCONFIG
           echo "CONFIG_RAMOOPS_DUMP_OOPS=y" >> $DEFCONFIG
-          echo "CONFIG_RAMOOPS_MEM_SIZE=0x20000" >> $DEFCONFIG
+          echo "CONFIG_RAMOOPS_MEM_SIZE=0x100000" >> $DEFCONFIG      # 改为 1MB
           echo "CONFIG_RAMOOPS_RECORD_SIZE=0x20000" >> $DEFCONFIG
-          echo "CONFIG_ANDROID_RAM_CONSOLE=y" >> $DEFCONFIG
-          echo "CONFIG_ANDROID_RAM_CONSOLE_ENABLE_VERBOSE=y" >> $DEFCONFIG
-          echo "CONFIG_ANDROID_RAM_CONSOLE_EARLY_INIT=y" >> $DEFCONFIG
-          echo "CONFIG_ANDROID_RAM_CONSOLE_BUFFER_SIZE=1048576" >> $DEFCONFIG
-          echo 'CONFIG_CMDLINE="panic=-1 ignore_loglevel printk.devkmsg=on printk.time=1"' >> $DEFCONFIG
+          
+          # ====== CMDLINE（关键修复）======
+          # 追加到 bootloader cmdline，而不是覆盖
+          echo 'CONFIG_CMDLINE="panic=30 ignore_loglevel printk.devkmsg=on printk.time=1 rcupdate.rcu_cpu_stall_suppress=1"' >> $DEFCONFIG
+          echo "CONFIG_CMDLINE_EXTEND=y" >> $DEFCONFIG
+          echo "# CONFIG_CMDLINE_FORCE is not set" >> $DEFCONFIG
+          
+          # Framebuffer console（保留）
           echo "CONFIG_VT=y" >> $DEFCONFIG
           echo "CONFIG_VT_CONSOLE=y" >> $DEFCONFIG
           echo "CONFIG_FRAMEBUFFER_CONSOLE=y" >> $DEFCONFIG
           echo "CONFIG_FRAMEBUFFER_CONSOLE_DETECT_PRIMARY=y" >> $DEFCONFIG
-          echo "CONFIG_LOGO=y" >> $DEFCONFIG
-          echo "CONFIG_CMDLINE_FORCE=y" >> $DEFCONFIG
 
 
       - name: 🧰 Patch Kernel of Re:Kernel
