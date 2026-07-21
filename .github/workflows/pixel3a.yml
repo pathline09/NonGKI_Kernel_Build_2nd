@@ -1,4 +1,4 @@
-name: Build Xiaomi Mix2s (Evolution X 10 A15)
+name: Pixel3a
 
 on:
   workflow_call:
