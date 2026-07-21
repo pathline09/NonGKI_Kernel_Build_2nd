@@ -43,8 +43,8 @@ env:
 
   BOOT_SOURCE : "https://mirrors.ocf.berkeley.edu/lineageos/full/sargo/20260711/boot.img"
 
-  NEED_DTBO : true
-  NEED_SAFE_DTBO : true
+  NEED_DTBO : false
+  NEED_SAFE_DTBO : false
 
   ROM_TEXT : "lineageos23_a16"
 
