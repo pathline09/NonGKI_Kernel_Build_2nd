@@ -107,6 +107,12 @@ jobs:
 
       - name: ⚙️ Get neccssary tools
         uses: ./.github/workflows/build-ready
+          
+      - name: 🪝 Patch Kernel of SUSFS
+        uses: ./.github/workflows/patch-susfs
+
+      - name: 🔗 Patch for no-kprobe
+        uses: ./.github/workflows/patch-no-kprobe
 
       - name: 🪛 Extra Kernel Options
         run: |
@@ -116,12 +122,12 @@ jobs:
           sed -i '/^CONFIG_LOCALVERSION_AUTO=/d' $DEFCONFIG
           echo 'CONFIG_LOCALVERSION="-pathline"' >> $DEFCONFIG
           echo "CONFIG_LOCALVERSION_AUTO=n" >> $DEFCONFIG
-          
-      - name: 🪝 Patch Kernel of SUSFS
-        uses: ./.github/workflows/patch-susfs
-
-      - name: 🔗 Patch for no-kprobe
-        uses: ./.github/workflows/patch-no-kprobe
+          sed -i '/^CONFIG_PSI=/d' $DEFCONFIG
+          sed -i '/^CONFIG_MEMCG=/d' $DEFCONFIG
+          sed -i '/^CONFIG_MEMCG_SWAP=/d' $DEFCONFIG
+          echo "CONFIG_PSI=y" >> $DEFCONFIG
+          echo "CONFIG_MEMCG=y" >> $DEFCONFIG
+          echo "CONFIG_MEMCG_SWAP=y" >> $DEFCONFIG
 
       - name: 🧰 Patch Kernel of Re:Kernel
         uses: ./.github/workflows/patch-rekernel
