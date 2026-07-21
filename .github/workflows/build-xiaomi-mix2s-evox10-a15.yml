@@ -67,7 +67,7 @@ env:
 
   HOOK_METHOD: "syscall" # Manual hook method -> syscall.
 
-  KERNEL_PATCH: "false" # If your kernel version is <= 4.9, you have the option of enabling the patch to patch the kernel_write and kernel_read functions.
+  KERNEL_PATCH: "true" # If your kernel version is <= 4.9, you have the option of enabling the patch to patch the kernel_write and kernel_read functions.
 
   KPM_ENABLE: "false" # Anyone devices.
   KPM_INLINE: "false" # Only use it for SukiSU-Ultra.
@@ -127,16 +127,24 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/device_kernel
           DEFCONFIG=arch/arm64/configs/sdm670_defconfig
-          sed -i '/^CONFIG_LOCALVERSION=/d' $DEFCONFIG
-          sed -i '/^CONFIG_LOCALVERSION_AUTO=/d' $DEFCONFIG
-          echo 'CONFIG_LOCALVERSION="-pathline"' >> $DEFCONFIG
-          echo "CONFIG_LOCALVERSION_AUTO=n" >> $DEFCONFIG
-          sed -i '/^CONFIG_PSI=/d' $DEFCONFIG
-          sed -i '/^CONFIG_MEMCG=/d' $DEFCONFIG
-          sed -i '/^CONFIG_MEMCG_SWAP=/d' $DEFCONFIG
-          echo "CONFIG_PSI=y" >> $DEFCONFIG
-          echo "CONFIG_MEMCG=y" >> $DEFCONFIG
-          echo "CONFIG_MEMCG_SWAP=y" >> $DEFCONFIG
+          REMOTE_URL="https://raw.githubusercontent.com/pathline09/NonGKI_Kernel_Build_2nd/refs/heads/mainline/config.txt"
+          wget -q -O remote_defconfig "$REMOTE_URL" || { echo "Download failed"; exit 1; }
+          while IFS= read -r line; do
+            if [[ "$line" =~ ^CONFIG_[A-Z0-9_]+= ]]; then
+              config_name=$(echo "$line" | cut -d '=' -f1)
+              sed -i "/^${config_name}=/d" "$DEFCONFIG"
+              echo "$line" >> "$DEFCONFIG"
+            fi
+          done < remote_defconfig
+          rm remote_defconfig
+          for opt in CONFIG_PSI CONFIG_MEMCG CONFIG_MEMCG_SWAP CONFIG_LOCALVERSION CONFIG_LOCALVERSION_AUTO; do
+            sed -i "/^${opt}=/d" "$DEFCONFIG"
+          done
+          echo 'CONFIG_LOCALVERSION="-pathline"' >> "$DEFCONFIG"
+          echo "CONFIG_LOCALVERSION_AUTO=n" >> "$DEFCONFIG"
+          echo "CONFIG_PSI=y" >> "$DEFCONFIG"
+          echo "CONFIG_MEMCG=y" >> "$DEFCONFIG"
+          echo "CONFIG_MEMCG_SWAP=y" >> "$DEFCONFIG"
 
       - name: 🚀 Build Process
         uses: ./.github/workflows/build-process
